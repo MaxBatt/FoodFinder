@@ -4,5 +4,16 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/bins/gson-2.2.2.jar"/>
 	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/bins/mysql-connector-java-5.1.20-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Jackson/jackson-annotations-2.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Jackson/jackson-core-2.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Jackson/jackson-databind-2.1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/jetty-webapp-7.3.0.v20110203.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/log4j-1.2.14.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/servlet-api-3.0.pre4.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/spark-0.9.9.3-SNAPSHOT-javadoc.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/spark-0.9.9.3-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="lib" path="/Users/beatmax/Documents/Eclipse Workspaces/FoodFinder Server/libs/Spark/spark-0.9.9.3-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

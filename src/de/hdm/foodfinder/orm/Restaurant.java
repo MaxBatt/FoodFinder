@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
@@ -25,6 +26,7 @@ public class Restaurant extends Persistence {
 	private String country;
 	private String longitude;
 	private String latitude;
+	private String distance;
 	
 	/*
 	 * …ffentlicher Konstruktor
@@ -54,9 +56,12 @@ public class Restaurant extends Persistence {
 		this.streetNumber 	= result.getString("street_number");
 		this.city 			= result.getString("city");
 		this.postcode 		= result.getString("postcode");
-		this.country 			= result.getString("country");
+		this.country 		= result.getString("country");
 		this.longitude 		= result.getString("longitude");
 		this.latitude 		= result.getString("latitude");
+		double distance		= result.getDouble("distance");
+		DecimalFormat df 	= new DecimalFormat("0.00");
+		this.distance		= df.format(distance) + "km";
 	}
 
 
@@ -234,9 +239,12 @@ public class Restaurant extends Persistence {
 	}
 
 	
-	//EmpfŠngt als Parameter Sortierung, Start-Zeile und Limit
-	//fŸr Order einfach den Namen des jeweiligen Tabellenfelds benutzen
-	public static RestaurantList getRestaurantList(String order, int start, int limit) throws ffException{
+	/*
+	 * Gibt eine Liste aller Restaurants mit den gegebenen Suchkriterien aus
+	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien (Kategorien und Gerichte: categories, dishes, distance (Umkreis)
+	 * order: Sortierung (Name des Tabellenfelds), start und limit fŸr Listenlimitierung
+	 */
+	public static RestaurantList getRestaurantList(String longi, String lati, int[] categories, int[] dishes, String distance, String order, String start, String limit) throws ffException{
 		makeConnection();
     	PreparedStatement preparedStatement = null;
     	
@@ -244,14 +252,42 @@ public class Restaurant extends Persistence {
         {
             try {
             	//Statement vorbereiten
-                String sql = "SELECT * from restaurants ORDER BY ? LIMIT ?, ?";
-                preparedStatement = conn.prepareStatement(sql);
+                String sql = "SELECT DISTINCT r . *, "
+                			+ "( 6371 * acos( cos( radians( " + lati + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longi +  " ) ) + sin( radians( " + lati + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
+                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd "
+                			+ "WHERE r.id = rhc.restaurant_id ";
+                			
+                			
                 
-                preparedStatement.setString(1, order);
-                preparedStatement.setInt(2, start);
-                preparedStatement.setInt(3, limit);
+                if(categories.length > 0){
+                	sql +=  "AND ( ";
+                	for(int c: categories){
+                    	sql += "rhc.category_id = " + c + " OR ";
+                    }
+                	sql =  sql.substring(0, sql.length() -3);
+                	sql	+= " ) ";
+                }
+                
+                sql += " AND r.id = rhd.restaurant_id ";
+                
+                if(dishes.length > 0){
+                	sql +=  "OR ( ";
+                	for(int d: dishes){
+                    	sql += "rhd.dish_id = " + d + " OR ";
+                    }
+                	sql =  sql.substring(0, sql.length() -3);
+                	sql	+= " ) ";
+                }
+                			
+                sql += " HAVING distance <  " + distance
+                	+  " ORDER BY distance ASC " 
+                	+  " LIMIT " + start + ", " + limit;
+                
+                
+                System.out.println(sql);
                 
                 //Statement absetzen
+                preparedStatement = conn.prepareStatement(sql);
                 ResultSet result = preparedStatement.executeQuery();
                 
                 ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
