@@ -68,26 +68,25 @@ public class RestaurantRoutes {
 					String region = req.queryParams("region");
 					String categories = req.queryParams("categories");
 					String distance = req.queryParams("distance");
-					
-					//return "lat: " + latitude + " long: " + longitude + " dishes: " + dishes + " region " + region + " categories: " + categories +  " distance: " + distance;
-					
-					
+
+					// return "lat: " + latitude + " long: " + longitude +
+					// " dishes: " + dishes + " region " + region +
+					// " categories: " + categories + " distance: " + distance;
+
 					String[] dishesArr;
 					int[] categoriesArr;
 					dishesArr = gson.fromJson(dishes, String[].class);
 					categoriesArr = gson.fromJson(categories, int[].class);
-					
 
 					Restaurant.RestaurantList list = Restaurant
-							.getRestaurantList(latitude, longitude, categoriesArr, dishesArr,
-									distance, "id", "0", "20");
+							.getRestaurantList(latitude, longitude, dishesArr,
+									region, categoriesArr, distance, "id", "0",
+									"20");
 
 					System.out.println(list.getJson());
 					return list.getJson();
-					
-					
-					
-					//return "lol";
+
+					// return "lol";
 
 				} catch (Exception e) {
 					res.status(Router.HTTP_SERVER_ERROR);

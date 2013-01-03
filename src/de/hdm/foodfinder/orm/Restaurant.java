@@ -244,7 +244,7 @@ public class Restaurant extends Persistence {
 	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien (Kategorien und Gerichte: categories, dishes, distance (Umkreis)
 	 * order: Sortierung (Name des Tabellenfelds), start und limit fŸr Listenlimitierung
 	 */
-	public static RestaurantList getRestaurantList(String latitude, String longitude, int[] categories, String[] dishes, String distance, String order, String start, String limit) throws ffException{
+	public static RestaurantList getRestaurantList(String latitude, String longitude,String[] dishes, String region, int[] categories, String distance, String order, String start, String limit) throws ffException{
 		makeConnection();
     	PreparedStatement preparedStatement = null;
     	
@@ -255,10 +255,9 @@ public class Restaurant extends Persistence {
             	//Statement vorbereiten
                 String sql = "SELECT DISTINCT r . *, "
                 			+ "( 6371 * acos( cos( radians( " + latitude + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longitude +  " ) ) + sin( radians( " + latitude + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
-                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd, dishes d "
-                			+ "WHERE r.id = rhc.restaurant_id ";			
+                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd, dishes d, res_has_reg rhg, regions reg "
+                			+ "WHERE r.id = rhc.restaurant_id AND r.id = rhg.restaurant_id ";			
                 			
-                System.out.println(sql);
                 if(categories.length > 0){
                 	sql +=  "AND ( ";
                 	for(int c: categories){
@@ -278,13 +277,17 @@ public class Restaurant extends Persistence {
                 	sql =  sql.substring(0, sql.length() -3);
                 	sql	+= " ) ";
                 }
+                
+                if(region != "Alle"){
+                	sql +=  "OR ( reg.name LIKE '" + region + "' )";
+                }
                 			
-                sql += " HAVING distance <  " + distance
+                sql += " HAVING distance <=  " + distance
                 	+  " ORDER BY distance ASC " 
                 	+  " LIMIT " + start + ", " + limit;
                 
                 
-               
+                System.out.println(sql);
                 
                 //Statement absetzen
                 preparedStatement = conn.prepareStatement(sql);
