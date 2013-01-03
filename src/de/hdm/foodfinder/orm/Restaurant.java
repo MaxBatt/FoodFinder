@@ -27,48 +27,50 @@ public class Restaurant extends Persistence {
 	private String latitude;
 	private String longitude;
 	private String distance;
-	
-	/*
-	 * Öffentlicher Konstruktor
-	 * Dieser wird benutzt, um ein Objekt aus Benutzereingaben zu erzeugen und in der DB zu speichern 
-	 */
-	public Restaurant(String name, String street, String streetNumber, String city, String postcode, String country, String longitude, String latitude) {
-		this.name 			= name;
-		this.street 		= street;
-		this.streetNumber 	= streetNumber;
-		this.city 			= city;
-		this.postcode 		= postcode;
-		this.country		= country;
-		this.latitude 		= latitude;
-		this.longitude 		= longitude;
-	}
-	
-	/*
-	 * Privater Konstruktor
-	 * Dieser wird benutzt, um ein Objekt aus einem Datensatz zu erzeugen
-	 * Nimmt als Parameter ein ResultSet einer Abfrage entgegen
-	 */
-	private Restaurant(ResultSet result) throws SQLException{
-		this.id 			= result.getInt("id");
-		this.ownerID 		= result.getInt("owner_id");
-		this.name			= result.getString("name");
-		this.street 		= result.getString("street");
-		this.streetNumber 	= result.getString("street_number");
-		this.city 			= result.getString("city");
-		this.postcode 		= result.getString("postcode");
-		this.country 		= result.getString("country");
-		this.longitude 		= result.getString("longitude");
-		this.latitude 		= result.getString("latitude");
-		double distance		= result.getDouble("distance");
-		DecimalFormat df 	= new DecimalFormat("0.00");
-		this.distance		= df.format(distance) + "km";
-	}
-
 
 	/*
-	 * Ruft den Datensatz für eine gegebene RestaurantID ab und mappt diesen auf ein Objekt
+	 * Öffentlicher Konstruktor Dieser wird benutzt, um ein Objekt aus
+	 * Benutzereingaben zu erzeugen und in der DB zu speichern
 	 */
-	public static Restaurant getRestaurant(int id)  throws ffException  {
+	public Restaurant(String name, String street, String streetNumber,
+			String city, String postcode, String country, String longitude,
+			String latitude) {
+		this.name = name;
+		this.street = street;
+		this.streetNumber = streetNumber;
+		this.city = city;
+		this.postcode = postcode;
+		this.country = country;
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
+	/*
+	 * Privater Konstruktor Dieser wird benutzt, um ein Objekt aus einem
+	 * Datensatz zu erzeugen Nimmt als Parameter ein ResultSet einer Abfrage
+	 * entgegen
+	 */
+	private Restaurant(ResultSet result) throws SQLException {
+		this.id = result.getInt("id");
+		this.ownerID = result.getInt("owner_id");
+		this.name = result.getString("name");
+		this.street = result.getString("street");
+		this.streetNumber = result.getString("street_number");
+		this.city = result.getString("city");
+		this.postcode = result.getString("postcode");
+		this.country = result.getString("country");
+		this.longitude = result.getString("longitude");
+		this.latitude = result.getString("latitude");
+		double distance = result.getDouble("distance");
+		DecimalFormat df = new DecimalFormat("0.00");
+		this.distance = df.format(distance) + "km";
+	}
+
+	/*
+	 * Ruft den Datensatz für eine gegebene RestaurantID ab und mappt diesen auf
+	 * ein Objekt
+	 */
+	public static Restaurant getRestaurant(int id) throws ffException {
 
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -86,25 +88,22 @@ public class Restaurant extends Persistence {
 
 				// Restaurant-Objekt anlegen
 				if (result.next()) {
-					return new Restaurant(result);	
-				}
-				else
-					 throw new ffException(ffException.ErrorCode.NO_ENTRY_ERR); 
+					return new Restaurant(result);
+				} else
+					throw new ffException(ffException.ErrorCode.NO_ENTRY_ERR);
 			} catch (SQLException e) {
 				// ToDo
 				e.printStackTrace();
 				throw new ffException(ffException.ErrorCode.DB_ERR);
 			}
-		}
-		else
+		} else
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
 	/*
 	 * Legt in der DB für das aktuelle Objekt einen Datensatz an
 	 */
-	public void insert() throws ffException 
-	{
+	public void insert() throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 		ResultSet res;
@@ -113,17 +112,17 @@ public class Restaurant extends Persistence {
 			try {
 
 				// Statement vorbereiten
-				
+
 				String sql = "INSERT INTO restaurants (owner_id, name, street, street_number, city, postcode, country, longitude, latitude) VALUES (?,?,?,?,?,?,?,?,?)";
-				
+
 				preparedStatement = conn.prepareStatement(sql,
 						Statement.RETURN_GENERATED_KEYS);
-				
+
 				if (this.ownerID != null)
 					preparedStatement.setInt(1, this.ownerID);
 				else
 					preparedStatement.setNull(1, Types.INTEGER);
-				
+
 				preparedStatement.setString(2, this.name);
 				preparedStatement.setString(3, this.street);
 				preparedStatement.setString(4, this.streetNumber);
@@ -132,9 +131,9 @@ public class Restaurant extends Persistence {
 				preparedStatement.setString(7, this.country);
 				preparedStatement.setString(8, this.longitude);
 				preparedStatement.setString(9, this.latitude);
-				
+
 				// System.out.println(preparedStatement);
-				
+
 				// Statement absetzen
 				preparedStatement.execute();
 
@@ -152,8 +151,7 @@ public class Restaurant extends Persistence {
 				e.printStackTrace();
 				throw new ffException(ffException.ErrorCode.DB_ERR);
 			}
-		}
-		else	
+		} else
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
@@ -162,7 +160,7 @@ public class Restaurant extends Persistence {
 
 		if (id == null) // Restaurant wurde noch nicht mit der DB abgeglichen.
 			throw new ffException(ffException.ErrorCode.NO_ENTRY_ERR);
-		
+
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -170,9 +168,9 @@ public class Restaurant extends Persistence {
 			try {
 				// Statement vorbereiten
 				String sql = "UPDATE restaurants SET owner_id = ?, name = ?, street = ?, street_number = ?, city = ?, postcode = ?, country = ?, longitude = ?, latitude = ? WHERE id = ?";
-				
+
 				preparedStatement = conn.prepareStatement(sql);
-				
+
 				preparedStatement.setInt(1, this.ownerID);
 				preparedStatement.setString(2, this.name);
 				preparedStatement.setString(3, this.street);
@@ -201,16 +199,15 @@ public class Restaurant extends Persistence {
 			}
 		}
 		throw new ffException(ffException.ErrorCode.DB_ERR);
-	
-	
+
 	}
-	
+
 	// Restaurant-Datensatz löschen
 	public void delete() throws ffException {
 
 		if (id == null) // Restaurant wurde noch nicht mit der DB abgeglichen.
 			throw new ffException(ffException.ErrorCode.NO_ENTRY_ERR);
-			
+
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -225,7 +222,7 @@ public class Restaurant extends Persistence {
 				int affectedRows = preparedStatement.executeUpdate();
 
 				if (affectedRows > 0)
-					 return;
+					return;
 				else
 					throw new ffException(ffException.ErrorCode.DELETE_ERR);
 
@@ -238,184 +235,176 @@ public class Restaurant extends Persistence {
 		throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	
 	/*
 	 * Gibt eine Liste aller Restaurants mit den gegebenen Suchkriterien aus
-	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien (Kategorien und Gerichte: categories, dishes, distance (Umkreis)
-	 * order: Sortierung (Name des Tabellenfelds), start und limit für Listenlimitierung
+	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien
+	 * (Kategorien und Gerichte: categories, dishes, distance (Umkreis) order:
+	 * Sortierung (Name des Tabellenfelds), start und limit für
+	 * Listenlimitierung
 	 */
-	public static RestaurantList getRestaurantList(String latitude, String longitude,String[] dishes, String region, int[] categories, String distance, String order, String start, String limit) throws ffException{
+	public static RestaurantList getRestaurantList(String latitude,
+			String longitude, String[] dishes, String region, int[] categories,
+			String distance, String order, String start, String limit)
+			throws ffException {
 		makeConnection();
-    	PreparedStatement preparedStatement = null;
-    	
-        if(conn != null)
-        {
+		PreparedStatement preparedStatement = null;
+		
+		System.out.println("d: " + dishes.length);
+		System.out.println("c: " + categories.length);
+		System.out.println("r: " + region);
 
-            try {
-            	//Statement vorbereiten
-                String sql = "SELECT DISTINCT r . *, "
-                			+ "( 6371 * acos( cos( radians( " + latitude + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longitude +  " ) ) + sin( radians( " + latitude + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
-                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd, dishes d, res_has_reg rhg, regions reg "
-                			+ "WHERE r.id = rhc.restaurant_id AND r.id = rhg.restaurant_id ";			
-                			
-                if(categories.length > 0){
-                	sql +=  "AND ( ";
-                	for(int c: categories){
-                    	sql += "rhc.category_id = " + c + " OR ";
-                    }
-                	sql =  sql.substring(0, sql.length() -3);
-                	sql	+= " ) ";
-                }
-                
-                sql += " AND r.id = rhd.restaurant_id ";
-                
-                if(dishes.length > 0){
-                	sql +=  "OR ( ";
-                	for(String d: dishes){
-                    	sql += "d.name LIKE '" + d + "' OR ";
-                    }
-                	sql =  sql.substring(0, sql.length() -3);
-                	sql	+= " ) ";
-                }
-                
-                if(region != "Alle"){
-                	sql +=  "OR ( reg.name LIKE '" + region + "' )";
-                }
-                			
-                sql += " HAVING distance <=  " + distance
-                	+  " ORDER BY distance ASC " 
-                	+  " LIMIT " + start + ", " + limit;
-                
-                
-                System.out.println(sql);
-                
-                //Statement absetzen
-                preparedStatement = conn.prepareStatement(sql);
-                ResultSet result = preparedStatement.executeQuery();
-                
-                ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
-                
-                //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
-                while(result.next())
-                {
-                	Restaurant restaurant = new Restaurant(result);
-                	restaurantList.add(restaurant);
-                }
-                
-                return new RestaurantList(restaurantList);
-                
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new ffException(ffException.ErrorCode.DB_ERR);
-            }
-        }
-        else
-        	throw new ffException(ffException.ErrorCode.DB_ERR);
-	}
-	
-	
-	/*
-	
-	//Gibt die PetitionList eines bestimmten Users zurück
-		//Empfängt als Parameter UserID,  Sortierung, Start-Zeile und Limit
-		public static PetitionList getPetitionListByUser(int userID, String order, int start, int limit) throws ESellException{
-			
-			makeConnection();
-	    	PreparedStatement preparedStatement = null;
-	    	
-	        if(conn != null)
-	        {
-	            try {
-	            	//Statement vorbereiten
-	                String sql = "SELECT * from petitions WHERE user_id = ? ORDER BY ? LIMIT ?, ?";
-	                preparedStatement = conn.prepareStatement(sql);
-	                
-	                preparedStatement.setInt(1, userID);
-	                preparedStatement.setString(2, order);
-	                preparedStatement.setInt(3, start);
-	                preparedStatement.setInt(4, limit);
-	                
-	                //Statement absetzen
-	                ResultSet result = preparedStatement.executeQuery();
-	                
-	                ArrayList<Petition> petitionList = new ArrayList<Petition>();
-	                
-	                //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
-	                while(result.next())
-	                {
-	                	Petition petition = new Petition(result);
-	                	petitionList.add(petition);
-	                }
-	                
-	                return new PetitionList(petitionList);
-	            } catch (SQLException e) {
-	                e.printStackTrace();
-	                throw new ESellException(ESellException.ErrorCode.DB_ERR);
-	            }
-	        }
-	        else
-	        	throw new ESellException(ESellException.ErrorCode.DB_ERR);
-		}
-	
 		
-		//Gibt die PetitionList einer bestimmten Kategorie zurück
-				//Empfängt als Parameter CategoryID,  Sortierung, Start-Zeile und Limit
-				public static PetitionList getPetitionListByCategory(int categoryID, String order, int start, int limit) throws ESellException{
-					
-					makeConnection();
-			    	PreparedStatement preparedStatement = null;
-			    	
-			        if(conn != null)
-			        {
-			            try {
-			            	//Statement vorbereiten
-			                String sql = "SELECT * from petitions WHERE category_id = ? ORDER BY ? LIMIT ?, ?";
-			                preparedStatement = conn.prepareStatement(sql);
-			                
-			                preparedStatement.setInt(1, categoryID);
-			                preparedStatement.setString(2, order);
-			                preparedStatement.setInt(3, start);
-			                preparedStatement.setInt(4, limit);
-			                
-			                //Statement absetzen
-			                ResultSet result = preparedStatement.executeQuery();
-			                
-			                ArrayList<Petition> petitionList = new ArrayList<Petition>();
-			                
-			                //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
-			                while(result.next())
-			                {
-			                	Petition petition = new Petition(result);
-			                	petitionList.add(petition);
-			                }
-			                
-			                return new PetitionList(petitionList);
-			            } catch (SQLException e) {
-			                e.printStackTrace();
-			                throw new ESellException(ESellException.ErrorCode.DB_ERR);
-			            }
-			        }
-			        else
-			        	throw new ESellException(ESellException.ErrorCode.DB_ERR);
-				}
-	*/
+		if (conn != null) {
 
-	
-	public static class RestaurantList{
-		
-		private ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
-		
-		//Konstruktor
-				private RestaurantList(ArrayList<Restaurant> restaurantList)
-				{
-					this.restaurantList = restaurantList;
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( 48.53238 ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( 9.07968 ) ) + sin( radians( 48.53238 ) ) * sin( radians( latitude ) ) ) ) AS distance " +
+								" FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg" +
+								" WHERE ("+
+								" r.id = rhd.restaurant_id" +
+								" AND r.id = rhr.restaurant_id" + 
+								" AND rhr.region_id = reg.id" +
+								" AND r.id = rhc.restaurant_id" + 
+								")";
+				
+				if(categories.length > 0 || dishes.length > 0 || region.length() > 0){
+					sql += "AND (";
 				}
 				
-				public String getJson(){
-					Gson gson = new Gson();
-					String json = gson.toJson(this.restaurantList);
-					return json; 
+				if (dishes.length > 0) {
+					sql += "( ";
+					for (String d : dishes) {
+						sql += "d.name LIKE '" + d.replace("_", " ") + "' OR ";
+					}
+					sql = sql.substring(0, sql.length() - 3);
+					sql += " ) OR ";
 				}
-		
+				
+				if (region.length() > 0) {
+					sql += " ( reg.name LIKE '" + region + "' ) OR ";
+				}
+				
+				if (categories.length > 0) {
+					sql += " ( ";
+					for (int c : categories) {
+						sql += "rhc.category_id = " + c + " OR ";
+					}
+					sql = sql.substring(0, sql.length() - 3);
+					sql += " ) OR ";
+				}
+
+				if(categories.length > 0 || dishes.length >0 || region.length() > 0){
+					sql = sql.substring(0, sql.length()-3);
+					sql += ")";
+				}
+
+				
+
+				
+
+				sql += " HAVING distance <=  " + distance
+						+ " ORDER BY distance ASC " + " LIMIT " + start + ", "
+						+ limit;
+ 
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+
+				// Für jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					Restaurant restaurant = new Restaurant(result);
+					restaurantList.add(restaurant);
+				}
+
+				return new RestaurantList(restaurantList);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+	}
+
+	/*
+	 * 
+	 * //Gibt die PetitionList eines bestimmten Users zurück //Empfängt als
+	 * Parameter UserID, Sortierung, Start-Zeile und Limit public static
+	 * PetitionList getPetitionListByUser(int userID, String order, int start,
+	 * int limit) throws ESellException{
+	 * 
+	 * makeConnection(); PreparedStatement preparedStatement = null;
+	 * 
+	 * if(conn != null) { try { //Statement vorbereiten String sql =
+	 * "SELECT * from petitions WHERE user_id = ? ORDER BY ? LIMIT ?, ?";
+	 * preparedStatement = conn.prepareStatement(sql);
+	 * 
+	 * preparedStatement.setInt(1, userID); preparedStatement.setString(2,
+	 * order); preparedStatement.setInt(3, start); preparedStatement.setInt(4,
+	 * limit);
+	 * 
+	 * //Statement absetzen ResultSet result = preparedStatement.executeQuery();
+	 * 
+	 * ArrayList<Petition> petitionList = new ArrayList<Petition>();
+	 * 
+	 * //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
+	 * while(result.next()) { Petition petition = new Petition(result);
+	 * petitionList.add(petition); }
+	 * 
+	 * return new PetitionList(petitionList); } catch (SQLException e) {
+	 * e.printStackTrace(); throw new
+	 * ESellException(ESellException.ErrorCode.DB_ERR); } } else throw new
+	 * ESellException(ESellException.ErrorCode.DB_ERR); }
+	 * 
+	 * 
+	 * //Gibt die PetitionList einer bestimmten Kategorie zurück //Empfängt als
+	 * Parameter CategoryID, Sortierung, Start-Zeile und Limit public static
+	 * PetitionList getPetitionListByCategory(int categoryID, String order, int
+	 * start, int limit) throws ESellException{
+	 * 
+	 * makeConnection(); PreparedStatement preparedStatement = null;
+	 * 
+	 * if(conn != null) { try { //Statement vorbereiten String sql =
+	 * "SELECT * from petitions WHERE category_id = ? ORDER BY ? LIMIT ?, ?";
+	 * preparedStatement = conn.prepareStatement(sql);
+	 * 
+	 * preparedStatement.setInt(1, categoryID); preparedStatement.setString(2,
+	 * order); preparedStatement.setInt(3, start); preparedStatement.setInt(4,
+	 * limit);
+	 * 
+	 * //Statement absetzen ResultSet result = preparedStatement.executeQuery();
+	 * 
+	 * ArrayList<Petition> petitionList = new ArrayList<Petition>();
+	 * 
+	 * //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
+	 * while(result.next()) { Petition petition = new Petition(result);
+	 * petitionList.add(petition); }
+	 * 
+	 * return new PetitionList(petitionList); } catch (SQLException e) {
+	 * e.printStackTrace(); throw new
+	 * ESellException(ESellException.ErrorCode.DB_ERR); } } else throw new
+	 * ESellException(ESellException.ErrorCode.DB_ERR); }
+	 */
+
+	public static class RestaurantList {
+
+		private ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
+
+		// Konstruktor
+		private RestaurantList(ArrayList<Restaurant> restaurantList) {
+			this.restaurantList = restaurantList;
+		}
+
+		public String getJson() {
+			Gson gson = new Gson();
+			String json = gson.toJson(this.restaurantList);
+			return json;
+		}
+
 	}
 }
