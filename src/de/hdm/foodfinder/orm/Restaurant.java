@@ -24,8 +24,8 @@ public class Restaurant extends Persistence {
 	private String city;
 	private String postcode;
 	private String country;
-	private String longitude;
 	private String latitude;
+	private String longitude;
 	private String distance;
 	
 	/*
@@ -39,8 +39,8 @@ public class Restaurant extends Persistence {
 		this.city 			= city;
 		this.postcode 		= postcode;
 		this.country		= country;
-		this.longitude 		= longitude;
 		this.latitude 		= latitude;
+		this.longitude 		= longitude;
 	}
 	
 	/*
@@ -244,21 +244,21 @@ public class Restaurant extends Persistence {
 	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien (Kategorien und Gerichte: categories, dishes, distance (Umkreis)
 	 * order: Sortierung (Name des Tabellenfelds), start und limit fŸr Listenlimitierung
 	 */
-	public static RestaurantList getRestaurantList(String longi, String lati, int[] categories, int[] dishes, String distance, String order, String start, String limit) throws ffException{
+	public static RestaurantList getRestaurantList(String latitude, String longitude, int[] categories, String[] dishes, String distance, String order, String start, String limit) throws ffException{
 		makeConnection();
     	PreparedStatement preparedStatement = null;
     	
         if(conn != null)
         {
+
             try {
             	//Statement vorbereiten
                 String sql = "SELECT DISTINCT r . *, "
-                			+ "( 6371 * acos( cos( radians( " + lati + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longi +  " ) ) + sin( radians( " + lati + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
-                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd "
-                			+ "WHERE r.id = rhc.restaurant_id ";
+                			+ "( 6371 * acos( cos( radians( " + latitude + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longitude +  " ) ) + sin( radians( " + latitude + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
+                			+ "FROM restaurants r, res_has_cat rhc, res_has_dish rhd, dishes d "
+                			+ "WHERE r.id = rhc.restaurant_id ";			
                 			
-                			
-                
+                System.out.println(sql);
                 if(categories.length > 0){
                 	sql +=  "AND ( ";
                 	for(int c: categories){
@@ -272,8 +272,8 @@ public class Restaurant extends Persistence {
                 
                 if(dishes.length > 0){
                 	sql +=  "OR ( ";
-                	for(int d: dishes){
-                    	sql += "rhd.dish_id = " + d + " OR ";
+                	for(String d: dishes){
+                    	sql += "d.name LIKE '" + d + "' OR ";
                     }
                 	sql =  sql.substring(0, sql.length() -3);
                 	sql	+= " ) ";
@@ -284,7 +284,7 @@ public class Restaurant extends Persistence {
                 	+  " LIMIT " + start + ", " + limit;
                 
                 
-                System.out.println(sql);
+               
                 
                 //Statement absetzen
                 preparedStatement = conn.prepareStatement(sql);
