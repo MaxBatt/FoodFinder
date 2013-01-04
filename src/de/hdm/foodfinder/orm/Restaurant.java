@@ -249,15 +249,21 @@ public class Restaurant extends Persistence {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
-		//System.out.println("d: " + dishes.length);
-		//System.out.println("c: " + categories.length);
-		//System.out.println("r: " + region);
+		// System.out.println("d: " + dishes.length);
+		// System.out.println("c: " + categories.length);
+		// System.out.println("r: " + region);
 
 		if (conn != null) {
 
 			try {
 				// Statement vorbereiten
-				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( " + latitude + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longitude +  " ) ) + sin( radians( " + latitude + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
+				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( "
+						+ latitude
+						+ " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( "
+						+ longitude
+						+ " ) ) + sin( radians( "
+						+ latitude
+						+ " ) ) * sin( radians( latitude ) ) ) ) AS distance "
 						+ " FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg"
 						+ " WHERE ("
 						+ " r.id = rhd.restaurant_id"
@@ -281,7 +287,8 @@ public class Restaurant extends Persistence {
 				}
 
 				if (region.length() > 0) {
-					sql += " ( reg.name LIKE '" + region.replace("_", " ") + "' ) OR ";
+					sql += " ( reg.name LIKE '" + region.replace("_", " ")
+							+ "' ) OR ";
 				}
 
 				if (categories.length > 0) {
@@ -345,7 +352,7 @@ public class Restaurant extends Persistence {
 
 	}
 
-	public static String getDishesById(int id) throws ffException {
+	public static ArrayList<String> getDishesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -374,8 +381,7 @@ public class Restaurant extends Persistence {
 					dishes.add(dish);
 				}
 
-				Gson gson = new Gson();
-				return gson.toJson(dishes);
+				return dishes;
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -386,7 +392,7 @@ public class Restaurant extends Persistence {
 
 	}
 
-	public static String getRegionsById(int id) throws ffException {
+	public static ArrayList<String> getRegionsById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -415,8 +421,43 @@ public class Restaurant extends Persistence {
 					regions.add(dish);
 				}
 
-				Gson gson = new Gson();
-				return gson.toJson(regions);
+				return regions;
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+
+	public static ArrayList<String> getPhotosById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT * FROM photos WHERE restaurant_id = " + id;
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<String> photos = new ArrayList<String>();
+
+				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					String photo = result.getString("path");
+					photos.add(photo);
+				}
+
+				return photos;
 
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -427,7 +468,42 @@ public class Restaurant extends Persistence {
 
 	}
 	
-	public static String getCategoriesById(int id) throws ffException {
+	public static String getAvgRatingById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT AVG(rating) AS avg_rating FROM ratings WHERE restaurant_id =" + id;
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				String avgRating = "";
+
+				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					avgRating = result.getString("avg_rating");
+				}
+
+				return avgRating;
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+	
+	public static ArrayList<String> getCategoriesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -456,8 +532,7 @@ public class Restaurant extends Persistence {
 					categories.add(dish);
 				}
 
-				Gson gson = new Gson();
-				return gson.toJson(categories);
+				return categories;
 
 			} catch (SQLException e) {
 				e.printStackTrace();

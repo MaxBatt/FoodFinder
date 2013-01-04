@@ -2,6 +2,10 @@ package de.hdm.foodfinder.server;
 
 import static spark.Spark.get;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.google.gson.Gson;
 
 import de.hdm.foodfinder.orm.*;
@@ -92,51 +96,41 @@ public class RestaurantRoutes {
 				}
 			}
 		});
-		
-		
-		// Gibt die Gerichte eines Restauratns zurück
-		get(new Route("/restaurant/:id/dishes") {
+
+		/*
+		 * Gibt die zusätzlichen Infos eines Restaurants als JSON zurück:
+		 * Gerichte, Regionen, Kategorien, Fotos, AvgRating
+		 */
+		get(new Route("/restaurant/:id/infos") {
 			@Override
 			public Object handle(Request req, Response res) {
+				res.type("application/json");
+				
+				Map<String, Object> map = new HashMap<String,Object>();
+				
 				try {
 					int id = Integer.parseInt(req.params("id"));
-					res.type("application/json");
-					return Restaurant.getDishesById(id);
+					
+					Gson gson = new Gson();
+					map.put("dishes", (Restaurant.getDishesById(id)));
+					map.put("regions", (Restaurant.getRegionsById(id)));
+					map.put("categories", (Restaurant.getCategoriesById(id)));
+					map.put("photos", (Restaurant.getPhotosById(id)));
+					map.put("avgRating", (Restaurant.getAvgRatingById(id)));
+					
+					
+					res.status(Router.HTTP_OKAY);
+					
+					
+					return gson.toJson(map);
+					
 				} catch (Exception e) {
 					res.status(Router.HTTP_SERVER_ERROR);
 					return e.getMessage();
 				}
+
 			}
 		});
-		
-		// Gibt die Regionen/Nationalitäten eines Restaurants zurück
-		get(new Route("/restaurant/:id/regions") {
-			@Override
-			public Object handle(Request req, Response res) {
-				try {
-					int id = Integer.parseInt(req.params("id"));
-					res.type("application/json");
-					return Restaurant.getRegionsById(id);
-				} catch (Exception e) {
-					res.status(Router.HTTP_SERVER_ERROR);
-					return e.getMessage();
-				}
-			}
-		});
-		
-		// Gibt die Kategorien eines Restaurants zurück
-		get(new Route("/restaurant/:id/categories") {
-			@Override
-			public Object handle(Request req, Response res) {
-				try {
-					int id = Integer.parseInt(req.params("id"));
-					res.type("application/json");
-					return Restaurant.getCategoriesById(id);
-				} catch (Exception e) {
-					res.status(Router.HTTP_SERVER_ERROR);
-					return e.getMessage();
-				}
-			}
-		});
+
 	}
 }
