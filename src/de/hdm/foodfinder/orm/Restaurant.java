@@ -249,15 +249,15 @@ public class Restaurant extends Persistence {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
-		System.out.println("d: " + dishes.length);
-		System.out.println("c: " + categories.length);
-		System.out.println("r: " + region);
+		//System.out.println("d: " + dishes.length);
+		//System.out.println("c: " + categories.length);
+		//System.out.println("r: " + region);
 
 		if (conn != null) {
 
 			try {
 				// Statement vorbereiten
-				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( 48.53238 ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( 9.07968 ) ) + sin( radians( 48.53238 ) ) * sin( radians( latitude ) ) ) ) AS distance "
+				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( " + latitude + " ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( " + longitude +  " ) ) + sin( radians( " + latitude + " ) ) * sin( radians( latitude ) ) ) ) AS distance "
 						+ " FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg"
 						+ " WHERE ("
 						+ " r.id = rhd.restaurant_id"
@@ -281,7 +281,7 @@ public class Restaurant extends Persistence {
 				}
 
 				if (region.length() > 0) {
-					sql += " ( reg.name LIKE '" + region + "' ) OR ";
+					sql += " ( reg.name LIKE '" + region.replace("_", " ") + "' ) OR ";
 				}
 
 				if (categories.length > 0) {
