@@ -274,7 +274,7 @@ public class Restaurant extends Persistence {
 				if (dishes.length > 0) {
 					sql += "( ";
 					for (String d : dishes) {
-						sql += "d.name LIKE '" + d.replace("_", " ") + "' OR ";
+						sql += "d.name LIKE '%" + d.replace("_", " ") + "%' OR ";
 					}
 					sql = sql.substring(0, sql.length() - 3);
 					sql += " ) OR ";
