@@ -2,8 +2,6 @@ package de.hdm.foodfinder.server;
 
 import static spark.Spark.get;
 
-import java.util.ArrayList;
-
 import com.google.gson.Gson;
 
 import de.hdm.foodfinder.orm.*;
@@ -23,7 +21,7 @@ public class RestaurantRoutes {
 
 	public RestaurantRoutes() {
 
-		// Alle Kaufgesuche eines Nutzers
+		// Restaurants mit Parametern
 		get(new Route("/restaurants") {
 			@Override
 			public Object handle(Request req, Response res) {
@@ -94,6 +92,51 @@ public class RestaurantRoutes {
 				}
 			}
 		});
-
+		
+		
+		// Gibt die Gerichte eines Restauratns zurück
+		get(new Route("/restaurant/:id/dishes") {
+			@Override
+			public Object handle(Request req, Response res) {
+				try {
+					int id = Integer.parseInt(req.params("id"));
+					res.type("application/json");
+					return Restaurant.getDishesById(id);
+				} catch (Exception e) {
+					res.status(Router.HTTP_SERVER_ERROR);
+					return e.getMessage();
+				}
+			}
+		});
+		
+		// Gibt die Regionen/Nationalitäten eines Restaurants zurück
+		get(new Route("/restaurant/:id/regions") {
+			@Override
+			public Object handle(Request req, Response res) {
+				try {
+					int id = Integer.parseInt(req.params("id"));
+					res.type("application/json");
+					return Restaurant.getRegionsById(id);
+				} catch (Exception e) {
+					res.status(Router.HTTP_SERVER_ERROR);
+					return e.getMessage();
+				}
+			}
+		});
+		
+		// Gibt die Kategorien eines Restaurants zurück
+		get(new Route("/restaurant/:id/categories") {
+			@Override
+			public Object handle(Request req, Response res) {
+				try {
+					int id = Integer.parseInt(req.params("id"));
+					res.type("application/json");
+					return Restaurant.getCategoriesById(id);
+				} catch (Exception e) {
+					res.status(Router.HTTP_SERVER_ERROR);
+					return e.getMessage();
+				}
+			}
+		});
 	}
 }

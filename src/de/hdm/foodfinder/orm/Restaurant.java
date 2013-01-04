@@ -248,42 +248,42 @@ public class Restaurant extends Persistence {
 			throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
-		
+
 		System.out.println("d: " + dishes.length);
 		System.out.println("c: " + categories.length);
 		System.out.println("r: " + region);
 
-		
 		if (conn != null) {
 
 			try {
 				// Statement vorbereiten
-				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( 48.53238 ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( 9.07968 ) ) + sin( radians( 48.53238 ) ) * sin( radians( latitude ) ) ) ) AS distance " +
-								" FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg" +
-								" WHERE ("+
-								" r.id = rhd.restaurant_id" +
-								" AND r.id = rhr.restaurant_id" + 
-								" AND rhr.region_id = reg.id" +
-								" AND r.id = rhc.restaurant_id" + 
-								")";
-				
-				if(categories.length > 0 || dishes.length > 0 || region.length() > 0){
+				String sql = "SELECT DISTINCT r. * , ( 6371 * acos( cos( radians( 48.53238 ) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians( 9.07968 ) ) + sin( radians( 48.53238 ) ) * sin( radians( latitude ) ) ) ) AS distance "
+						+ " FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg"
+						+ " WHERE ("
+						+ " r.id = rhd.restaurant_id"
+						+ " AND r.id = rhr.restaurant_id"
+						+ " AND rhr.region_id = reg.id"
+						+ " AND r.id = rhc.restaurant_id" + ")";
+
+				if (categories.length > 0 || dishes.length > 0
+						|| region.length() > 0) {
 					sql += "AND (";
 				}
-				
+
 				if (dishes.length > 0) {
 					sql += "( ";
 					for (String d : dishes) {
-						sql += "d.name LIKE '%" + d.replace("_", " ") + "%' OR ";
+						sql += "d.name LIKE '%" + d.replace("_", " ")
+								+ "%' OR ";
 					}
 					sql = sql.substring(0, sql.length() - 3);
 					sql += " ) OR ";
 				}
-				
+
 				if (region.length() > 0) {
 					sql += " ( reg.name LIKE '" + region + "' ) OR ";
 				}
-				
+
 				if (categories.length > 0) {
 					sql += " ( ";
 					for (int c : categories) {
@@ -293,19 +293,16 @@ public class Restaurant extends Persistence {
 					sql += " ) OR ";
 				}
 
-				if(categories.length > 0 || dishes.length >0 || region.length() > 0){
-					sql = sql.substring(0, sql.length()-3);
+				if (categories.length > 0 || dishes.length > 0
+						|| region.length() > 0) {
+					sql = sql.substring(0, sql.length() - 3);
 					sql += ")";
 				}
-
-				
-
-				
 
 				sql += " HAVING distance <=  " + distance
 						+ " ORDER BY distance ASC " + " LIMIT " + start + ", "
 						+ limit;
- 
+
 				System.out.println(sql);
 
 				// Statement absetzen
@@ -331,66 +328,6 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	/*
-	 * 
-	 * //Gibt die PetitionList eines bestimmten Users zurück //Empfängt als
-	 * Parameter UserID, Sortierung, Start-Zeile und Limit public static
-	 * PetitionList getPetitionListByUser(int userID, String order, int start,
-	 * int limit) throws ESellException{
-	 * 
-	 * makeConnection(); PreparedStatement preparedStatement = null;
-	 * 
-	 * if(conn != null) { try { //Statement vorbereiten String sql =
-	 * "SELECT * from petitions WHERE user_id = ? ORDER BY ? LIMIT ?, ?";
-	 * preparedStatement = conn.prepareStatement(sql);
-	 * 
-	 * preparedStatement.setInt(1, userID); preparedStatement.setString(2,
-	 * order); preparedStatement.setInt(3, start); preparedStatement.setInt(4,
-	 * limit);
-	 * 
-	 * //Statement absetzen ResultSet result = preparedStatement.executeQuery();
-	 * 
-	 * ArrayList<Petition> petitionList = new ArrayList<Petition>();
-	 * 
-	 * //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
-	 * while(result.next()) { Petition petition = new Petition(result);
-	 * petitionList.add(petition); }
-	 * 
-	 * return new PetitionList(petitionList); } catch (SQLException e) {
-	 * e.printStackTrace(); throw new
-	 * ESellException(ESellException.ErrorCode.DB_ERR); } } else throw new
-	 * ESellException(ESellException.ErrorCode.DB_ERR); }
-	 * 
-	 * 
-	 * //Gibt die PetitionList einer bestimmten Kategorie zurück //Empfängt als
-	 * Parameter CategoryID, Sortierung, Start-Zeile und Limit public static
-	 * PetitionList getPetitionListByCategory(int categoryID, String order, int
-	 * start, int limit) throws ESellException{
-	 * 
-	 * makeConnection(); PreparedStatement preparedStatement = null;
-	 * 
-	 * if(conn != null) { try { //Statement vorbereiten String sql =
-	 * "SELECT * from petitions WHERE category_id = ? ORDER BY ? LIMIT ?, ?";
-	 * preparedStatement = conn.prepareStatement(sql);
-	 * 
-	 * preparedStatement.setInt(1, categoryID); preparedStatement.setString(2,
-	 * order); preparedStatement.setInt(3, start); preparedStatement.setInt(4,
-	 * limit);
-	 * 
-	 * //Statement absetzen ResultSet result = preparedStatement.executeQuery();
-	 * 
-	 * ArrayList<Petition> petitionList = new ArrayList<Petition>();
-	 * 
-	 * //Für jeden Datensatz ein Objekt anlegen und in die Liste packen
-	 * while(result.next()) { Petition petition = new Petition(result);
-	 * petitionList.add(petition); }
-	 * 
-	 * return new PetitionList(petitionList); } catch (SQLException e) {
-	 * e.printStackTrace(); throw new
-	 * ESellException(ESellException.ErrorCode.DB_ERR); } } else throw new
-	 * ESellException(ESellException.ErrorCode.DB_ERR); }
-	 */
-
 	public static class RestaurantList {
 
 		private ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
@@ -407,4 +344,128 @@ public class Restaurant extends Persistence {
 		}
 
 	}
+
+	public static String getDishesById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT d.name FROM restaurants r, res_has_dish rhd, dishes d"
+						+ " WHERE r.id = "
+						+ id
+						+ " AND r.id = rhd.restaurant_id"
+						+ " AND rhd.dish_id = d.id";
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<String> dishes = new ArrayList<String>();
+
+				// Für jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					String dish = result.getString("name");
+					dishes.add(dish);
+				}
+
+				Gson gson = new Gson();
+				return gson.toJson(dishes);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+
+	public static String getRegionsById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT reg.name FROM restaurants r, res_has_reg rhr, regions reg"
+						+ " WHERE r.id = "
+						+ id
+						+ " AND r.id = rhr.restaurant_id"
+						+ " AND rhr.region_id = reg.id";
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<String> regions = new ArrayList<String>();
+
+				// Für jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					String dish = result.getString("name");
+					regions.add(dish);
+				}
+
+				Gson gson = new Gson();
+				return gson.toJson(regions);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+	
+	public static String getCategoriesById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT cat.name FROM restaurants r, res_has_cat rhc, categories cat"
+						+ " WHERE r.id = "
+						+ id
+						+ " AND r.id = rhc.restaurant_id"
+						+ " AND rhc.category_id= cat.id";
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<String> categories = new ArrayList<String>();
+
+				// Für jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					String dish = result.getString("name");
+					categories.add(dish);
+				}
+
+				Gson gson = new Gson();
+				return gson.toJson(categories);
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+
 }
