@@ -27,6 +27,12 @@ public class Restaurant extends Persistence {
 	private String latitude;
 	private String longitude;
 	private String distance;
+	
+	private ArrayList<String> dishes;
+	private ArrayList<String> regions;
+	private ArrayList<String> categories;
+	private ArrayList<String> photos;
+	private String avgRating;
 
 	/*
 	 * …ffentlicher Konstruktor Dieser wird benutzt, um ein Objekt aus
@@ -50,7 +56,7 @@ public class Restaurant extends Persistence {
 	 * Datensatz zu erzeugen Nimmt als Parameter ein ResultSet einer Abfrage
 	 * entgegen
 	 */
-	private Restaurant(ResultSet result) throws SQLException {
+	private Restaurant(ResultSet result) throws SQLException, ffException {
 		this.id = result.getInt("id");
 		this.ownerID = result.getInt("owner_id");
 		this.name = result.getString("name");
@@ -64,6 +70,13 @@ public class Restaurant extends Persistence {
 		double distance = result.getDouble("distance");
 		DecimalFormat df = new DecimalFormat("0.00");
 		this.distance = df.format(distance) + "km";
+		
+		this.dishes = getDishesById(result.getInt("id"));
+		this.regions = getRegionsById(result.getInt("id"));
+		this.categories = getCategoriesById(result.getInt("id"));
+		this.photos = getPhotosById(result.getInt("id"));
+		this.avgRating = getAvgRatingById(result.getInt("id"));
+		
 	}
 
 	/*
@@ -352,7 +365,7 @@ public class Restaurant extends Persistence {
 
 	}
 
-	public static ArrayList<String> getDishesById(int id) throws ffException {
+	private ArrayList<String> getDishesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -373,16 +386,14 @@ public class Restaurant extends Persistence {
 				ResultSet result = preparedStatement.executeQuery();
 
 				ArrayList<String> dishes = new ArrayList<String>();
-
 				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
 				// packen
 				while (result.next()) {
 					String dish = result.getString("name");
 					dishes.add(dish);
 				}
-
 				return dishes;
-
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new ffException(ffException.ErrorCode.DB_ERR);
@@ -392,7 +403,7 @@ public class Restaurant extends Persistence {
 
 	}
 
-	public static ArrayList<String> getRegionsById(int id) throws ffException {
+	private ArrayList<String> getRegionsById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -431,79 +442,8 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 
 	}
-
-	public static ArrayList<String> getPhotosById(int id) throws ffException {
-		makeConnection();
-		PreparedStatement preparedStatement = null;
-
-		if (conn != null) {
-
-			try {
-				// Statement vorbereiten
-				String sql = "SELECT * FROM photos WHERE restaurant_id = " + id;
-
-				System.out.println(sql);
-
-				// Statement absetzen
-				preparedStatement = conn.prepareStatement(sql);
-				ResultSet result = preparedStatement.executeQuery();
-
-				ArrayList<String> photos = new ArrayList<String>();
-
-				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
-				// packen
-				while (result.next()) {
-					String photo = result.getString("path");
-					photos.add(photo);
-				}
-
-				return photos;
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-				throw new ffException(ffException.ErrorCode.DB_ERR);
-			}
-		} else
-			throw new ffException(ffException.ErrorCode.DB_ERR);
-
-	}
 	
-	public static String getAvgRatingById(int id) throws ffException {
-		makeConnection();
-		PreparedStatement preparedStatement = null;
-
-		if (conn != null) {
-
-			try {
-				// Statement vorbereiten
-				String sql = "SELECT AVG(rating) AS avg_rating FROM ratings WHERE restaurant_id =" + id;
-
-				System.out.println(sql);
-
-				// Statement absetzen
-				preparedStatement = conn.prepareStatement(sql);
-				ResultSet result = preparedStatement.executeQuery();
-
-				String avgRating = "";
-
-				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
-				// packen
-				while (result.next()) {
-					avgRating = result.getString("avg_rating");
-				}
-
-				return avgRating;
-
-			} catch (SQLException e) {
-				e.printStackTrace();
-				throw new ffException(ffException.ErrorCode.DB_ERR);
-			}
-		} else
-			throw new ffException(ffException.ErrorCode.DB_ERR);
-
-	}
-	
-	public static ArrayList<String> getCategoriesById(int id) throws ffException {
+	private ArrayList<String> getCategoriesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
@@ -542,5 +482,78 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 
 	}
+
+	private ArrayList<String> getPhotosById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT * FROM photos WHERE restaurant_id = " + id;
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				ArrayList<String> photos = new ArrayList<String>();
+
+				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					String photo = result.getString("path");
+					photos.add(photo);
+				}
+
+				return photos;
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+	
+	private String getAvgRatingById(int id) throws ffException {
+		makeConnection();
+		PreparedStatement preparedStatement = null;
+
+		if (conn != null) {
+
+			try {
+				// Statement vorbereiten
+				String sql = "SELECT AVG(rating) AS avg_rating FROM ratings WHERE restaurant_id =" + id;
+
+				System.out.println(sql);
+
+				// Statement absetzen
+				preparedStatement = conn.prepareStatement(sql);
+				ResultSet result = preparedStatement.executeQuery();
+
+				String avgRating = "";
+
+				// FŸr jeden Datensatz ein Objekt anlegen und in die Liste
+				// packen
+				while (result.next()) {
+					avgRating = result.getString("avg_rating");
+				}
+
+				return avgRating;
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new ffException(ffException.ErrorCode.DB_ERR);
+			}
+		} else
+			throw new ffException(ffException.ErrorCode.DB_ERR);
+
+	}
+	
+	
 
 }
