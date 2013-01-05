@@ -277,16 +277,18 @@ public class Restaurant extends Persistence {
 						+ " ) ) + sin( radians( "
 						+ latitude
 						+ " ) ) * sin( radians( latitude ) ) ) ) AS distance "
-						+ " FROM restaurants r, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc, dishes d, regions reg"
+						+ " FROM restaurants r, dishes d, categories c, regions reg, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc "
 						+ " WHERE ("
-						+ " r.id = rhd.restaurant_id"
+						+ " r.id = rhd.restaurant_id" 
+						+ " AND rhd.dish_id = d.id" 
+						+ " AND r.id = rhc.restaurant_id"
+						+ " AND rhc.category_id = c.id"
 						+ " AND r.id = rhr.restaurant_id"
-						+ " AND rhr.region_id = reg.id"
-						+ " AND r.id = rhc.restaurant_id" + ")";
+						+ " AND rhr.region_id = reg.id )";
 
 				if (categories.length > 0 || dishes.length > 0
 						|| region.length() > 0) {
-					sql += "AND (";
+					sql += " AND (";
 				}
 
 				if (dishes.length > 0) {
