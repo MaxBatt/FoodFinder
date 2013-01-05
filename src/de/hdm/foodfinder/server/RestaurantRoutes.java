@@ -2,10 +2,6 @@ package de.hdm.foodfinder.server;
 
 import static spark.Spark.get;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.google.gson.Gson;
 
 import de.hdm.foodfinder.orm.*;
