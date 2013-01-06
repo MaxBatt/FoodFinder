@@ -10,11 +10,13 @@ import spark.Response;
 import spark.Route;
 
 /**
- * Routen f¸r Suchen
+ * RestaurantRoutes
  * 
- * Alle Kaufgesuche eines Nutzers: GET /user/:id/petitions Alle Kaufgesuche
- * einer Kategorie: GET /category/:catId/petitions Alle Kaufgesuche: GET
- * /petitions Alle Kategorien: GET /categories (Alle Nutzer: GET /users)
+ * Erstellt Server-Routen für Restaurant-Abfragen Bis jetzt gibt es nur die
+ * Route /restaurants für die Restaurantliste
+ * 
+ * @author Max Batt
+ * 
  */
 
 public class RestaurantRoutes {
@@ -40,27 +42,22 @@ public class RestaurantRoutes {
 					String categories = req.queryParams("categories");
 					String distance = req.queryParams("distance");
 
-					// return "lat: " + latitude + " long: " + longitude +
-					// " dishes: " + dishes + " region " + region +
-					// " categories: " + categories + " distance: " + distance;
-
+					// Aus Dishes und Categories String-Arrays machen
 					String[] dishesArr;
 					int[] categoriesArr;
+
+					// String Arrays in JSON wandeln
 					dishesArr = gson.fromJson(dishes, String[].class);
 					categoriesArr = gson.fromJson(categories, int[].class);
 
+					// RestaurantListe aus Params erstellen
 					Restaurant.RestaurantList list = Restaurant
 							.getRestaurantList(latitude, longitude, dishesArr,
 									region, categoriesArr, distance, "id", "0",
 									"20");
 
-					System.out.println(list.getJson());
-					
-					
-					
+					// Ergebnis als JSON zurückgeben
 					return list.getJson();
-
-					// return "lol";
 
 				} catch (Exception e) {
 					res.status(Router.HTTP_SERVER_ERROR);
@@ -68,8 +65,6 @@ public class RestaurantRoutes {
 				}
 			}
 		});
-
-		
 
 	}
 }

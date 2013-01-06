@@ -1,7 +1,5 @@
 package de.hdm.foodfinder.orm;
 
-//import hdm.stuttgart.esell.errors.ESellException;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,6 +12,19 @@ import com.mysql.jdbc.Statement;
 
 import de.hdm.foodfinder.errors.ffException;
 
+/**
+ * Restaurant
+ * 
+ * Serverseitige Represäntation eines Restaurants Bietet CRUD-Funktionalität für
+ * Restaurant Bietet mit getRestaurantList die Möglichkeit nach bestimmten
+ * Suchkriterien eine RestaurantListe aus der DB abzurufen
+ * 
+ * @author Max Batt
+ * 
+ *         basierend auf Petition.class by Max Batt & Andrian Riedl, eSell
+ *         DBServer: https://github.com/MaxBatt/eSellDBServer
+ * 
+ */
 public class Restaurant extends Persistence {
 
 	private Integer id;
@@ -27,7 +38,7 @@ public class Restaurant extends Persistence {
 	private String latitude;
 	private String longitude;
 	private String distance;
-	
+
 	private ArrayList<String> dishes;
 	private ArrayList<String> regions;
 	private ArrayList<String> categories;
@@ -70,13 +81,13 @@ public class Restaurant extends Persistence {
 		double distance = result.getDouble("distance");
 		DecimalFormat df = new DecimalFormat("0.00");
 		this.distance = df.format(distance) + "km";
-		
+
 		this.dishes = getDishesById(result.getInt("id"));
 		this.regions = getRegionsById(result.getInt("id"));
 		this.categories = getCategoriesById(result.getInt("id"));
 		this.photos = getPhotosById(result.getInt("id"));
 		this.avgRating = getAvgRatingById(result.getInt("id"));
-		
+
 	}
 
 	/*
@@ -262,10 +273,6 @@ public class Restaurant extends Persistence {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
 
-		// System.out.println("d: " + dishes.length);
-		// System.out.println("c: " + categories.length);
-		// System.out.println("r: " + region);
-
 		if (conn != null) {
 
 			try {
@@ -279,8 +286,8 @@ public class Restaurant extends Persistence {
 						+ " ) ) * sin( radians( latitude ) ) ) ) AS distance "
 						+ " FROM restaurants r, dishes d, categories c, regions reg, res_has_dish rhd, res_has_reg rhr, res_has_cat rhc "
 						+ " WHERE ("
-						+ " r.id = rhd.restaurant_id" 
-						+ " AND rhd.dish_id = d.id" 
+						+ " r.id = rhd.restaurant_id"
+						+ " AND rhd.dish_id = d.id"
 						+ " AND r.id = rhc.restaurant_id"
 						+ " AND rhc.category_id = c.id"
 						+ " AND r.id = rhr.restaurant_id"
@@ -350,6 +357,7 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
+	// RestaurantListe als ArrayList
 	public static class RestaurantList {
 
 		private ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
@@ -367,6 +375,12 @@ public class Restaurant extends Persistence {
 
 	}
 
+	/*
+	 * Methoden zum Abrufen von zusätzlichen Restaurant-Daten: Gerichte,
+	 * Regionen, Kategorien, Fotos, Bewertung
+	 */
+
+	// Gerichte
 	private ArrayList<String> getDishesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -395,7 +409,7 @@ public class Restaurant extends Persistence {
 					dishes.add(dish);
 				}
 				return dishes;
-				
+
 			} catch (SQLException e) {
 				e.printStackTrace();
 				throw new ffException(ffException.ErrorCode.DB_ERR);
@@ -405,6 +419,7 @@ public class Restaurant extends Persistence {
 
 	}
 
+	// Regionen
 	private ArrayList<String> getRegionsById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -444,7 +459,8 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 
 	}
-	
+
+	// Kategorien
 	private ArrayList<String> getCategoriesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -485,6 +501,7 @@ public class Restaurant extends Persistence {
 
 	}
 
+	// Fotos
 	private ArrayList<String> getPhotosById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -520,7 +537,8 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 
 	}
-	
+
+	// Average Rating
 	private String getAvgRatingById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -529,7 +547,8 @@ public class Restaurant extends Persistence {
 
 			try {
 				// Statement vorbereiten
-				String sql = "SELECT AVG(rating) AS avg_rating FROM ratings WHERE restaurant_id =" + id;
+				String sql = "SELECT AVG(rating) AS avg_rating FROM ratings WHERE restaurant_id ="
+						+ id;
 
 				System.out.println(sql);
 
@@ -555,7 +574,5 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 
 	}
-	
-	
 
 }

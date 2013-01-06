@@ -7,6 +7,14 @@ import java.sql.SQLException;
 
 import com.google.gson.Gson;
 
+/**
+ * Persistence
+ * 
+ * Stellt Verbindung zur DB her
+ * 
+ * @author Max Batt
+ *
+ */
 public abstract class Persistence {
 
 	protected static Connection conn = null;
