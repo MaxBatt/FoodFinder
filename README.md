@@ -1,4 +1,4 @@
-FoodFinder
-==========
+FoodFinder Server
+==================
 
-Android App for finding Food in your area
+Spark-Server mit RESTful Routing und ORM
