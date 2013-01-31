@@ -24,7 +24,7 @@ public class Router {
 	 */
 	public static void main(String[] args) {
 
-		// Sucherouten
+		// Restaurant Routen
 		new RestaurantRoutes();
 	}
 

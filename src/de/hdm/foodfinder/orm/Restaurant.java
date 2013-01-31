@@ -45,7 +45,7 @@ public class Restaurant extends Persistence {
 	private ArrayList<String> photos;
 	private String avgRating;
 
-	/*
+	/**
 	 * Öffentlicher Konstruktor Dieser wird benutzt, um ein Objekt aus
 	 * Benutzereingaben zu erzeugen und in der DB zu speichern
 	 */
@@ -62,7 +62,7 @@ public class Restaurant extends Persistence {
 		this.longitude = longitude;
 	}
 
-	/*
+	/**
 	 * Privater Konstruktor Dieser wird benutzt, um ein Objekt aus einem
 	 * Datensatz zu erzeugen Nimmt als Parameter ein ResultSet einer Abfrage
 	 * entgegen
@@ -90,7 +90,7 @@ public class Restaurant extends Persistence {
 
 	}
 
-	/*
+	/**
 	 * Ruft den Datensatz für eine gegebene RestaurantID ab und mappt diesen auf
 	 * ein Objekt
 	 */
@@ -124,7 +124,7 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	/*
+	/**
 	 * Legt in der DB für das aktuelle Objekt einen Datensatz an
 	 */
 	public void insert() throws ffException {
@@ -179,7 +179,9 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	// Updatet den Datensatz mit aktuellen Werten des Objekts
+	/**
+	 * Updatet den Datensatz mit aktuellen Werten des Objekts
+	 */
 	public void update() throws ffException {
 
 		if (id == null) // Restaurant wurde noch nicht mit der DB abgeglichen.
@@ -226,7 +228,9 @@ public class Restaurant extends Persistence {
 
 	}
 
-	// Restaurant-Datensatz löschen
+	/**
+	 * Restaurant-Datensatz löschen
+	 */
 	public void delete() throws ffException {
 
 		if (id == null) // Restaurant wurde noch nicht mit der DB abgeglichen.
@@ -259,7 +263,7 @@ public class Restaurant extends Persistence {
 		throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	/*
+	/**
 	 * Gibt eine Liste aller Restaurants mit den gegebenen Suchkriterien aus
 	 * Params: aktuelle Koordinaten longi und lati, arrays mit Suchkriterien
 	 * (Kategorien und Gerichte: categories, dishes, distance (Umkreis) order:
@@ -357,7 +361,11 @@ public class Restaurant extends Persistence {
 			throw new ffException(ffException.ErrorCode.DB_ERR);
 	}
 
-	// RestaurantListe als ArrayList
+	/**
+	 * Innere Klasse RestaurantList
+	 * 
+	 * Hält eine Liste von RestaurantObjekten
+	 */
 	public static class RestaurantList {
 
 		private ArrayList<Restaurant> restaurantList = new ArrayList<Restaurant>();
@@ -380,7 +388,9 @@ public class Restaurant extends Persistence {
 	 * Regionen, Kategorien, Fotos, Bewertung
 	 */
 
-	// Gerichte
+	/**
+	 * Ermittelt Gerichte eines Restaurants
+	 */
 	private ArrayList<String> getDishesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -419,7 +429,13 @@ public class Restaurant extends Persistence {
 
 	}
 
-	// Regionen
+	/**
+	 * Ermittelt Regionen eines Restaurants
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ffException
+	 */
 	private ArrayList<String> getRegionsById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -460,7 +476,13 @@ public class Restaurant extends Persistence {
 
 	}
 
-	// Kategorien
+	/**	
+	 * Ermittelt Kategorien eines Restaurants
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ffException
+	 */
 	private ArrayList<String> getCategoriesById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -501,7 +523,13 @@ public class Restaurant extends Persistence {
 
 	}
 
-	// Fotos
+	/**	
+	 * Ermittelt Fotos eines Restaurants
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ffException
+	 */
 	private ArrayList<String> getPhotosById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;
@@ -538,7 +566,13 @@ public class Restaurant extends Persistence {
 
 	}
 
-	// Average Rating
+	/** 
+	 * Ermittelt durchschnittliche Bewertung eines Restaurants
+	 * 
+	 * @param id
+	 * @return
+	 * @throws ffException
+	 */
 	private String getAvgRatingById(int id) throws ffException {
 		makeConnection();
 		PreparedStatement preparedStatement = null;

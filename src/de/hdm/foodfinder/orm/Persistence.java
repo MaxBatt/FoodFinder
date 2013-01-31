@@ -12,6 +12,8 @@ import com.google.gson.Gson;
  * 
  * Stellt Verbindung zur DB her
  * 
+ * Andere Klasse kšnnen diese Klasse erweitern und so die Verbindung nutzen
+ * 
  * @author Max Batt
  *
  */
@@ -34,7 +36,12 @@ public abstract class Persistence {
     // Datenbankpasswort
     private static String dbPassword = "root";
 
-     
+    
+    /**	
+     * makeConnection
+     * 
+     * Stellt mit den oben angegebenen Daten Verbindung zur DB her
+     */
     public static void makeConnection()
     {
         if(conn == null)
